@@ -2,6 +2,7 @@ from typing import List
 from pathlib import Path
 from os import environ
 from telethon import TelegramClient, events
+from datetime import timedelta
 from telethon.tl.functions.channels import EditBannedRequest
 from telethon.tl.types import (
     User,
@@ -10,10 +11,12 @@ from telethon.tl.types import (
     ChannelParticipantsAdmins,
 )
 
+DEF_RIGHTS = ChatBannedRights(until_date=None, send_games=True, send_gifs=True, send_inline=True, send_media=True, send_messages=True,
+                              send_polls=True, send_stickers=True, change_info=True, pin_messages=True)
+
 
 class FUCK_USELF(Exception):
     pass
-
 
 def update_env():
     try:
@@ -34,6 +37,10 @@ def find_FUCKING_words(text: str, blacklist: List[str] = ['блять', 'пиз�
             return True
     return False
 
+@bot.on(events.ChatAction)
+async def new_user(event: events.ChatAction):
+    if event.user_joined:
+        await event.respond('New user')
 
 @bot.on(event=events.NewMessage)
 async def some_message(event: events.NewMessage):
