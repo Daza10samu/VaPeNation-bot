@@ -2,6 +2,13 @@ from typing import List
 from pathlib import Path
 from os import environ
 from telethon import TelegramClient, events
+from telethon.tl.functions.channels import EditBannedRequest
+from telethon.tl.types import (
+    User,
+    PeerUser,
+    ChatBannedRights,
+    ChannelParticipantsAdmins,
+)
 
 
 class FUCK_USELF(Exception):
@@ -18,7 +25,7 @@ def update_env():
 
 
 update_env()
-clinet = TelegramClient('bot', environ['API_ID'], environ['API_HASH']).start(bot_token=environ['BOT_TOKEN'])
+bot = TelegramClient('bot', environ['API_ID'], environ['API_HASH']).start(bot_token=environ['BOT_TOKEN'])
 
 
 def find_FUCKING_words(text: str, blacklist: List[str] = ['блять', 'пиздец', 'хуй', 'уебок']) -> bool:
