@@ -55,7 +55,7 @@ class Student(SqlAlchemyBase):
         return Student.get_by_tg_id(tg_id) is not None
 
     @staticmethod
-    def get_by_fio(name, surname, secondname):
+    def get_by_fio(surname, name, secondname):
         session = create_session()
         *res, = filter(lambda x: x.name == name and x.surname == surname and x.secondname == secondname,
                        session.query(Student).all())

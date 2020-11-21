@@ -40,8 +40,6 @@ async def new_user(event: events.ChatAction):
 async def some_message(event: events.NewMessage):
     if event.text.startswith('/start') and event.is_private:
         await start_msg(event)
-    if event.text.startswith('/su'):
-        await after_verification(event, bot)
     else:
         await new_message_worker(event, bot)
 
