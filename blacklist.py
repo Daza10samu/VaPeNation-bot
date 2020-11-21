@@ -79,7 +79,6 @@ def blacklister(to_check_message: str) -> bool:
         if (mx_match * 1.0) / len(word) >= 0.5:
             black_list.add(word)
             ban = True
-            break
 
     if ban:
         update_words('black_list.data', black_list)
