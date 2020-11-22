@@ -9,6 +9,7 @@ from telethon.tl.types import User, PeerUser, ChatBannedRights, ChannelParticipa
 from os import environ
 from pathlib import Path
 
+
 class EnvFileNotFoundError(Exception):
     pass
 
@@ -59,7 +60,7 @@ async def new_message_worker(event: events.NewMessage, bot: TelegramClient):
     admins = await get_admin_list(event.chat, bot)
     if event.text.startswith('/start'):
         return
-    if event.text.startswith('/getinfo') and event.sender in admins:
+    elif event.text.startswith('/getinfo') and event.sender in admins:
         if event.message.reply_to is not None:
             user = db_worker.Student.get_by_tg_id((await event.get_reply_message()).sender_id)
             if user is not None:
@@ -76,7 +77,7 @@ async def new_message_worker(event: events.NewMessage, bot: TelegramClient):
                 await event.respond('К этому аккаунту не привязан пользователь')
         else:
             await event.respond('Неверный формат запроса')
-    if event.text.startswith('/mute') and event.sender in admins:
+    elif event.text.startswith('/mute') and event.sender in admins:
         await bot(EditBannedRequest(event.chat.id, (await event.get_reply_message()).sender_id,
                                     ChatBannedRights(
                                         until_date=datetime.now() + timedelta(minutes=int(event.text.split()[1])),
@@ -86,7 +87,7 @@ async def new_message_worker(event: events.NewMessage, bot: TelegramClient):
                                         send_polls=True, send_stickers=True, change_info=True,
                                         pin_messages=True)))
         await (await event.get_reply_message()).delete()
-    if len(event.text.split(' ')) == 3:
+    elif len(event.text.split(' ')) == 3 and event.is_private:
         student = db_worker.Student.get_by_fio(event.text.split(' ')[0], event.text.split(' ')[1],
                                                event.text.split(' ')[2])
         if student is not None:
@@ -96,7 +97,7 @@ async def new_message_worker(event: events.NewMessage, bot: TelegramClient):
                 return
             else:
                 await event.respond('Это пользователь занят')
-    if find_blacklisted_words(event.text):
+    elif find_blacklisted_words(event.text):
         await event.message.delete()
 
 
