@@ -7,10 +7,10 @@ class Student(SqlAlchemyBase):
     __tablename__ = 'students'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    group = Column(String)
-    name = Column(String)
-    surname = Column(String)
-    secondname = Column(String)
+    group = Column(String(10))
+    name = Column(String(20))
+    surname = Column(String(20))
+    secondname = Column(String(20))
     tg_id = Column(Integer)
 
     def __init__(self, name, surname, secondname, group):
