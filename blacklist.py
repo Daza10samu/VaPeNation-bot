@@ -87,7 +87,7 @@ def blacklister(to_check_message: str) -> bool:
 
     for word in message:
         mx_match = check(word)
-        if (mx_match * 1.0) / len(word) >= 0.5:
+        if (mx_match * 1.0) / len(word) >= 0.75:
             black_list.add(word)
             ban = True
 
