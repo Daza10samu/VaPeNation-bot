@@ -6,8 +6,25 @@ from telethon import TelegramClient, events
 import db_worker
 from blacklist import blacklister
 from telethon.tl.types import User, PeerUser, ChatBannedRights, ChannelParticipantsAdmins, PeerChannel
+from os import environ
+from pathlib import Path
 
-db_worker.create()
+class EnvFileNotFoundError(Exception):
+    pass
+
+
+def update_env():
+    try:
+        with (Path(__file__).absolute().parent / '.env').open() as file:
+            for name_val in map(lambda x: x.strip().split('='), file.readlines()):
+                environ[name_val[0]] = name_val[1]
+    except FileNotFoundError:
+        raise EnvFileNotFoundError('You should create the FUCKING .env FILE')
+
+
+update_env()
+
+db_worker.create(environ)
 
 DEF_RIGHTS = ChatBannedRights(until_date=None, send_games=True, send_gifs=True, send_inline=True, send_media=True,
                               send_messages=True,

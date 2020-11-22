@@ -1,13 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from os import environ
 
 engine = None
 SqlAlchemyBase = declarative_base()
 
 
-def create():
+def create(environ):
     global engine, __maker
     if 'MYSQL_DBNAME' not in environ:
         engine = create_engine('sqlite:///users.db', echo=False)
