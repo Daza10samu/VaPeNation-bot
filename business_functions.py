@@ -8,6 +8,9 @@ from blacklist import blacklister
 from telethon.tl.types import User, PeerUser, ChatBannedRights, ChannelParticipantsAdmins, PeerChannel
 from os import environ
 from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
+import asyncio
 
 
 class EnvFileNotFoundError(Exception):
@@ -32,8 +35,10 @@ DEF_RIGHTS = ChatBannedRights(until_date=None, send_games=True, send_gifs=True, 
                               send_polls=True, send_stickers=True, change_info=True, pin_messages=True)
 
 
-def find_blacklisted_words(text: str) -> bool:
-    return blacklister(text)
+async def find_blacklisted_words(text: str) -> bool:
+    with ProcessPoolExecutor() as exec:
+        # return await asyncio.get_running_loop().run_in_executor(exec, partial(blacklister, text))
+        return blacklister(text)
 
 
 async def new_user_worker(event: events.ChatAction, bot: TelegramClient):
@@ -77,6 +82,12 @@ async def new_message_worker(event: events.NewMessage, bot: TelegramClient):
                 await event.respond('К этому аккаунту не привязан пользователь')
         else:
             await event.respond('Неверный формат запроса')
+    elif event.text.startswith('/norm') and event.sender in admins:
+        with Path('def_words.data').open() as file:
+            words = set(file.read().split())
+        words.add(*(event.text.split()[1:]))
+        with Path('def_words.data').open('w') as file:
+            file.write(' '.join(words))
     elif event.text.startswith('/mute') and event.sender in admins:
         await bot(EditBannedRequest(event.chat.id, (await event.get_reply_message()).sender_id,
                                     ChatBannedRights(
@@ -97,7 +108,7 @@ async def new_message_worker(event: events.NewMessage, bot: TelegramClient):
                 return
             else:
                 await event.respond('Это пользователь занят')
-    elif find_blacklisted_words(event.text):
+    elif await find_blacklisted_words(event.text):
         await event.message.delete()
 
 

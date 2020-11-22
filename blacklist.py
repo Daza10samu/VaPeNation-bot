@@ -4,10 +4,9 @@ pref_list = set()
 black_list = set()
 message = set()
 def_words = set()
-words = set()
 
 
-def get_words(file: pathlib.Path) -> set:
+def get_words(file: pathlib.Path, spl: str=' ') -> set:
     words = set()
     f = open(file)
     words = set(f.read().split())
@@ -18,12 +17,15 @@ def get_words(file: pathlib.Path) -> set:
 def update_words(file: pathlib.Path, words: set):
     f = open(file, 'w')
     for word in words:
-        f.write(word + ' ')
+        f.write(word + '\n')
     f.close()
 
 
 def stemer(message: set, pref_list: set, def_words: set) -> set:
+    words = set()
     for word in message:
+        if word == ' ':
+            continue
         word = word.lower()
         mark = '\'";:?.,()!-\n'
         new_word = ''
@@ -38,14 +40,20 @@ def stemer(message: set, pref_list: set, def_words: set) -> set:
         words.discard(word)
 
     message.clear()
+
     for word in words:
         for pref in pref_list:
-            # print(f'{word} \n {word[:len(pref)]} {pref}')
             if len(word) > len(pref) and word[:len(pref)] == pref:
                 word = word[len(pref):]
+        if len(word) <= 3 and not word in black_list:
+            continue
         message.add(word)
     words.clear()
     words.update(message)
+
+    for word in def_words:
+        words.discard(word)
+
     return words
 
 
@@ -56,11 +64,14 @@ def add_to_deflist(word: str):
 
 def check(word: str) -> int:
     mx_match = 0
+    err = ''
     for bad_word in black_list:
         now_match = 0
         for i in range(min(len(word), len(bad_word))):
             now_match += ord(word[i]) == ord(bad_word[i])
         mx_match = max(mx_match, now_match)
+        if mx_match == now_match:
+            err = bad_word
     return mx_match
 
 
